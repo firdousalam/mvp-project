@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  # MongoDB for User Service
+  mongodb-user:
+    image: mongo:6
+    container_name: mongodb-user
+    ports:
+      - "27017:27017"
+    volumes:
+      - user-data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=userdb
+
+  # MongoDB for Product Service
+  mongodb-product:
+    image: mongo:6
+    container_name: mongodb-product
+    ports:
+      - "27018:27017"
+    volumes:
+      - product-data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=productdb
+
+  # MongoDB for Order Service
+  mongodb-order:
+    image: mongo:6
+    container_name: mongodb-order
+    ports:
+      - "27019:27017"
+    volumes:
+      - order-data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=orderdb
+
+  # User Service
+  user-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    container_name: user-service
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - MONGO_URI=mongodb://mongodb-user:27017/userdb
+    depends_on:
+      - mongodb-user
+    restart: unless-stopped
+
+  # Product Service
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    container_name: product-service
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - MONGO_URI=mongodb://mongodb-product:27017/productdb
+    depends_on:
+      - mongodb-product
+    restart: unless-stopped
+
+  # Order Service
+  order-service:
+    build:
+      context: ./order-service
+      dockerfile: Dockerfile
+    container_name: order-service
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - MONGO_URI=mongodb://mongodb-order:27017/orderdb
+      - USER_SERVICE_URL=http://user-service:3001
+      - PRODUCT_SERVICE_URL=http://product-service:3002
+    depends_on:
+      - mongodb-order
+      - user-service
+      - product-service
+    restart: unless-stopped
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - USER_SERVICE_URL=http://user-service:3001
+      - PRODUCT_SERVICE_URL=http://product-service:3002
+      - ORDER_SERVICE_URL=http://order-service:3003
+      - AUTH_ENABLED=false
+      - JWT_SECRET=your-secret-key-change-in-production
+      - NODE_ENV=development
+    depends_on:
+      - user-service
+      - product-service
+      - order-service
+    restart: unless-stopped
+
+volumes:
+  user-data:
+  product-data:
+  order-data:

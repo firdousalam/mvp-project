@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-user
+  labels:
+    app: mongodb-user
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+    name: mongodb
+  clusterIP: None
+  selector:
+    app: mongodb-user

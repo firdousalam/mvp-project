@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Order System - API Tester</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .service-section {
+            margin-bottom: 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .service-header {
+            background: #f5f5f5;
+            padding: 15px 20px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .service-header h2 {
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .status-indicator.online {
+            background: #4caf50;
+            box-shadow: 0 0 10px #4caf50;
+        }
+
+        .service-body {
+            padding: 20px;
+        }
+
+        .endpoint {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .method {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+
+        .method.post {
+            background: #4caf50;
+            color: white;
+        }
+
+        .method.get {
+            background: #2196f3;
+            color: white;
+        }
+
+        .method.put {
+            background: #ff9800;
+            color: white;
+        }
+
+        .method.delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: auto;
+            transition: background 0.3s;
+        }
+
+        .test-button:hover {
+            background: #5568d3;
+        }
+
+        .test-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .response {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .response.show {
+            display: block;
+        }
+
+        .response.success {
+            border-color: #4caf50;
+            background: #f1f8f4;
+        }
+
+        .response.error {
+            border-color: #f44336;
+            background: #fef1f0;
+        }
+
+        .input-group {
+            margin: 10px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .input-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quick-action-btn {
+            flex: 1;
+            padding: 15px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .quick-action-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛒 Product Order System</h1>
+            <p>Microservices API Testing Dashboard</p>
+        </div>
+
+        <div class="content">
+            <div class="quick-actions">
+                <button class="quick-action-btn" onclick="checkAllHealth()">🔍 Check All Services</button>
+                <button class="quick-action-btn" onclick="runFullDemo()">🚀 Run Full Demo</button>
+                <button class="quick-action-btn" onclick="clearAllResponses()">🗑️ Clear Results</button>
+            </div>
+
+            <!-- User Service -->
+            <div class="service-section">
+                <div class="service-header">
+                    <div>
+                        <h2>👤 User Service</h2>
+                        <small>Port 3001</small>
+                    </div>
+                    <span class="status-indicator" id="user-status"></span>
+                </div>
+                <div class="service-body">
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/health</span>
+                            <button class="test-button" onclick="testEndpoint('user', 'health')">Test</button>
+                        </div>
+                        <div class="response" id="user-health-response"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method post">POST</span>
+                            <span class="endpoint-path">/users</span>
+                            <button class="test-button" onclick="testEndpoint('user', 'create')">Test</button>
+                        </div>
+                        <div class="input-group">
+                            <label>Request Body:</label>
+                            <textarea
+                                id="user-create-body">{"email":"test@example.com","password":"password123","name":"Test User"}</textarea>
+                        </div>
+                        <div class="response" id="user-create-response"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method post">POST</span>
+                            <span class="endpoint-path">/auth/login</span>
+                            <button class="test-button" onclick="testEndpoint('user', 'login')">Test</button>
+                        </div>
+                        <div class="input-group">
+                            <label>Request Body:</label>
+                            <textarea
+                                id="user-login-body">{"email":"test@example.com","password":"password123"}</textarea>
+                        </div>
+                        <div class="response" id="user-login-response"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Service -->
+            <div class="service-section">
+                <div class="service-header">
+                    <div>
+                        <h2>📦 Product Service</h2>
+                        <small>Port 3002</small>
+                    </div>
+                    <span class="status-indicator" id="product-status"></span>
+                </div>
+                <div class="service-body">
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/health</span>
+                            <button class="test-button" onclick="testEndpoint('product', 'health')">Test</button>
+                        </div>
+                        <div class="response" id="product-health-response"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method post">POST</span>
+                            <span class="endpoint-path">/products</span>
+                            <button class="test-button" onclick="testEndpoint('product', 'create')">Test</button>
+                        </div>
+                        <div class="input-group">
+                            <label>Request Body:</label>
+                            <textarea
+                                id="product-create-body">{"name":"Laptop","description":"High-performance laptop","price":999.99,"stock":10}</textarea>
+                        </div>
+                        <div class="response" id="product-create-response"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/products</span>
+                            <button class="test-button" onclick="testEndpoint('product', 'list')">Test</button>
+                        </div>
+                        <div class="response" id="product-list-response"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Service -->
+            <div class="service-section">
+                <div class="service-header">
+                    <div>
+                        <h2>🛍️ Order Service</h2>
+                        <small>Port 3003</small>
+                    </div>
+                    <span class="status-indicator" id="order-status"></span>
+                </div>
+                <div class="service-body">
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/health</span>
+                            <button class="test-button" onclick="testEndpoint('order', 'health')">Test</button>
+                        </div>
+                        <div class="response" id="order-health-response"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method post">POST</span>
+                            <span class="endpoint-path">/orders</span>
+                            <button class="test-button" onclick="testEndpoint('order', 'create')">Test</button>
+                        </div>
+                        <div class="input-group">
+                            <label>Request Body (use IDs from above):</label>
+                            <textarea
+                                id="order-create-body">{"userId":"USER_ID_HERE","items":[{"productId":"PRODUCT_ID_HERE","quantity":2}]}</textarea>
+                        </div>
+                        <div class="response" id="order-create-response"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SERVICES = {
+            user: 'http://localhost:3001',
+            product: 'http://localhost:3002',
+            order: 'http://localhost:3003'
+        };
+
+        let createdUserId = null;
+        let createdProductId = null;
+
+        async function testEndpoint(service, endpoint) {
+            const responseDiv = document.getElementById(`${service}-${endpoint}-response`);
+            responseDiv.textContent = 'Loading...';
+            responseDiv.className = 'response show';
+
+            try {
+                let url, options;
+
+                switch (endpoint) {
+                    case 'health':
+                        url = `${SERVICES[service]}/health`;
+                        options = { method: 'GET' };
+                        break;
+
+                    case 'create':
+                        if (service === 'user') {
+                            url = `${SERVICES[service]}/users`;
+                            const body = document.getElementById('user-create-body').value;
+                            options = {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: body
+                            };
+                        } else if (service === 'product') {
+                            url = `${SERVICES[service]}/products`;
+                            const body = document.getElementById('product-create-body').value;
+                            options = {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: body
+                            };
+                        } else if (service === 'order') {
+                            url = `${SERVICES[service]}/orders`;
+                            const body = document.getElementById('order-create-body').value;
+                            options = {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: body
+                            };
+                        }
+                        break;
+
+                    case 'login':
+                        url = `${SERVICES[service]}/auth/login`;
+                        const loginBody = document.getElementById('user-login-body').value;
+                        options = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: loginBody
+                        };
+                        break;
+
+                    case 'list':
+                        url = `${SERVICES[service]}/products`;
+                        options = { method: 'GET' };
+                        break;
+                }
+
+                const response = await fetch(url, options);
+                const data = await response.json();
+
+                // Store IDs for later use
+                if (service === 'user' && endpoint === 'create' && data.id) {
+                    createdUserId = data.id;
+                }
+                if (service === 'product' && endpoint === 'create' && data.id) {
+                    createdProductId = data.id;
+                }
+
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+                responseDiv.className = `response show ${response.ok ? 'success' : 'error'}`;
+
+                // Update status indicator
+                document.getElementById(`${service}-status`).classList.add('online');
+
+            } catch (error) {
+                responseDiv.textContent = `Error: ${error.message}`;
+                responseDiv.className = 'response show error';
+                document.getElementById(`${service}-status`).classList.remove('online');
+            }
+        }
+
+        async function checkAllHealth() {
+            await testEndpoint('user', 'health');
+            await testEndpoint('product', 'health');
+            await testEndpoint('order', 'health');
+        }
+
+        async function runFullDemo() {
+            alert('Running full demo workflow...\n\n1. Create User\n2. Create Product\n3. Create Order');
+
+            // Create user
+            await testEndpoint('user', 'create');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Create product
+            await testEndpoint('product', 'create');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Update order form with IDs
+            if (createdUserId && createdProductId) {
+                const orderBody = {
+                    userId: createdUserId,
+                    items: [{
+                        productId: createdProductId,
+                        quantity: 2
+                    }]
+                };
+                document.getElementById('order-create-body').value = JSON.stringify(orderBody, null, 2);
+
+                // Create order
+                await testEndpoint('order', 'create');
+            }
+
+            alert('Demo complete! Check the results above.');
+        }
+
+        function clearAllResponses() {
+            document.querySelectorAll('.response').forEach(div => {
+                div.className = 'response';
+                div.textContent = '';
+            });
+        }
+
+        // Check health on load
+        window.addEventListener('load', () => {
+            setTimeout(checkAllHealth, 1000);
+        });
+    </script>
+</body>
+
+</html>

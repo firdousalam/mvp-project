@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Gateway Tester - Product Order System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .gateway-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .info-box h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        .gateway-url {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            text-align: center;
+            font-size: 1.1em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .service-section {
+            margin-bottom: 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .service-header {
+            background: #f5f5f5;
+            padding: 15px 20px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .service-header h2 {
+            color: #333;
+            font-size: 1.5em;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        .status-indicator.online {
+            background: #4caf50;
+            box-shadow: 0 0 10px #4caf50;
+        }
+
+        .service-body {
+            padding: 20px;
+        }
+
+        .endpoint {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .method {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-right: 10px;
+        }
+
+        .method.post {
+            background: #4caf50;
+            color: white;
+        }
+
+        .method.get {
+            background: #2196f3;
+            color: white;
+        }
+
+        .method.put {
+            background: #ff9800;
+            color: white;
+        }
+
+        .method.delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .endpoint-path {
+            font-family: 'Courier New', monospace;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .test-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: auto;
+            transition: background 0.3s;
+        }
+
+        .test-button:hover {
+            background: #5568d3;
+        }
+
+        .response {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .response.show {
+            display: block;
+        }
+
+        .response.success {
+            border-color: #4caf50;
+            background: #f1f8f4;
+        }
+
+        .response.error {
+            border-color: #f44336;
+            background: #fef1f0;
+        }
+
+        .input-group {
+            margin: 10px 0;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .input-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .quick-action-btn {
+            flex: 1;
+            padding: 15px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .quick-action-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .comparison-box {
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .comparison-box h4 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .comparison-box.old {
+            background: #ffebee;
+            border-color: #ef5350;
+        }
+
+        .comparison-box.new {
+            background: #e8f5e9;
+            border-color: #66bb6a;
+        }
+
+        .comparison-box code {
+            display: block;
+            background: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 API Gateway Tester</h1>
+            <p>Unified Entry Point for All Services</p>
+            <div class="gateway-badge">All requests go through http://localhost:8080</div>
+        </div>
+
+        <div class="content">
+            <div class="info-box">
+                <h3>✨ What's Different?</h3>
+                <p>Instead of accessing each service directly on different ports, the API Gateway provides a single
+                    entry point. All requests are automatically routed to the correct service.</p>
+
+                <div class="comparison">
+                    <div class="comparison-box old">
+                        <h4>❌ Without Gateway (Old Way)</h4>
+                        <code>http://localhost:3001/users</code>
+                        <code>http://localhost:3002/products</code>
+                        <code>http://localhost:3003/orders</code>
+                    </div>
+                    <div class="comparison-box new">
+                        <h4>✅ With Gateway (New Way)</h4>
+                        <code>http://localhost:8080/users</code>
+                        <code>http://localhost:8080/products</code>
+                        <code>http://localhost:8080/orders</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="gateway-url">
+                Gateway URL: http://localhost:8080
+            </div>
+
+            <div class="quick-actions">
+                <button class="quick-action-btn" onclick="checkGatewayHealth()">🔍 Check Gateway</button>
+                <button class="quick-action-btn" onclick="checkAllServices()">🏥 Check All Services</button>
+                <button class="quick-action-btn" onclick="runFullDemo()">🚀 Run Full Demo</button>
+                <button class="quick-action-btn" onclick="clearAllResponses()">🗑️ Clear Results</button>
+            </div>
+
+            <!-- Gateway Info -->
+            <div class="service-section">
+                <div class="service-header">
+                    <div>
+                        <h2>🌐 API Gateway</h2>
+                        <small>Port 8080 - Unified Entry Point</small>
+                    </div>
+                    <span class="status-indicator" id="gateway-status"></span>
+                </div>
+                <div class="service-body">
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/</span>
+                            <button class="test-button" onclick="testEndpoint('gateway', 'info')">Test</button>
+                        </div>
+                        <div class="response" id="gateway-info-response"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/health</span>
+                            <button class="test-button" onclick="testEndpoint('gateway', 'health')">Test</button>
+                        </div>
+                        <div class="response" id="gateway-health-response"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Service through Gateway -->
+            <div class="service-section">
+                <div class="service-header">
+                    <div>
+                        <h2>👤 User Service (via Gateway)</h2>
+                        <small>http://localhost:8080/users</small>
+                    </div>
+                    <span class="status-indicator" id="user-status"></span>
+                </div>
+                <div class="service-body">
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method post">POST</span>
+                            <span class="endpoint-path">/users</span>
+                            <button class="test-button" onclick="testEndpoint('user', 'create')">Test</button>
+                        </div>
+                        <div class="input-group">
+                            <label>Request Body:</label>
+                            <textarea
+                                id="user-create-body">{"email":"test@example.com","password":"password123","name":"Test User"}</textarea>
+                        </div>
+                        <div class="response" id="user-create-response"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method post">POST</span>
+                            <span class="endpoint-path">/auth/login</span>
+                            <button class="test-button" onclick="testEndpoint('user', 'login')">Test</button>
+                        </div>
+                        <div class="input-group">
+                            <label>Request Body:</label>
+                            <textarea
+                                id="user-login-body">{"email":"test@example.com","password":"password123"}</textarea>
+                        </div>
+                        <div class="response" id="user-login-response"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/health/user</span>
+                            <button class="test-button" onclick="testEndpoint('user', 'health')">Test</button>
+                        </div>
+                        <div class="response" id="user-health-response"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Service through Gateway -->
+            <div class="service-section">
+                <div class="service-header">
+                    <div>
+                        <h2>📦 Product Service (via Gateway)</h2>
+                        <small>http://localhost:8080/products</small>
+                    </div>
+                    <span class="status-indicator" id="product-status"></span>
+                </div>
+                <div class="service-body">
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method post">POST</span>
+                            <span class="endpoint-path">/products</span>
+                            <button class="test-button" onclick="testEndpoint('product', 'create')">Test</button>
+                        </div>
+                        <div class="input-group">
+                            <label>Request Body:</label>
+                            <textarea
+                                id="product-create-body">{"name":"Laptop","description":"High-performance laptop","price":999.99,"stock":10}</textarea>
+                        </div>
+                        <div class="response" id="product-create-response"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/products</span>
+                            <button class="test-button" onclick="testEndpoint('product', 'list')">Test</button>
+                        </div>
+                        <div class="response" id="product-list-response"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/health/product</span>
+                            <button class="test-button" onclick="testEndpoint('product', 'health')">Test</button>
+                        </div>
+                        <div class="response" id="product-health-response"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Service through Gateway -->
+            <div class="service-section">
+                <div class="service-header">
+                    <div>
+                        <h2>🛍️ Order Service (via Gateway)</h2>
+                        <small>http://localhost:8080/orders</small>
+                    </div>
+                    <span class="status-indicator" id="order-status"></span>
+                </div>
+                <div class="service-body">
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method post">POST</span>
+                            <span class="endpoint-path">/orders</span>
+                            <button class="test-button" onclick="testEndpoint('order', 'create')">Test</button>
+                        </div>
+                        <div class="input-group">
+                            <label>Request Body (use IDs from above):</label>
+                            <textarea
+                                id="order-create-body">{"userId":"USER_ID_HERE","items":[{"productId":"PRODUCT_ID_HERE","quantity":2}]}</textarea>
+                        </div>
+                        <div class="response" id="order-create-response"></div>
+                    </div>
+
+                    <div class="endpoint">
+                        <div class="endpoint-header">
+                            <span class="method get">GET</span>
+                            <span class="endpoint-path">/health/order</span>
+                            <button class="test-button" onclick="testEndpoint('order', 'health')">Test</button>
+                        </div>
+                        <div class="response" id="order-health-response"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GATEWAY_URL = 'http://localhost:8080';
+        let createdUserId = null;
+        let createdProductId = null;
+
+        async function testEndpoint(service, endpoint) {
+            const responseDiv = document.getElementById(`${service}-${endpoint}-response`);
+            responseDiv.textContent = 'Loading...';
+            responseDiv.className = 'response show';
+
+            try {
+                let url, options;
+
+                if (service === 'gateway') {
+                    if (endpoint === 'info') {
+                        url = `${GATEWAY_URL}/`;
+                        options = { method: 'GET' };
+                    } else if (endpoint === 'health') {
+                        url = `${GATEWAY_URL}/health`;
+                        options = { method: 'GET' };
+                    }
+                } else if (endpoint === 'health') {
+                    url = `${GATEWAY_URL}/health/${service}`;
+                    options = { method: 'GET' };
+                } else if (endpoint === 'create') {
+                    if (service === 'user') {
+                        url = `${GATEWAY_URL}/users`;
+                        const body = document.getElementById('user-create-body').value;
+                        options = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: body
+                        };
+                    } else if (service === 'product') {
+                        url = `${GATEWAY_URL}/products`;
+                        const body = document.getElementById('product-create-body').value;
+                        options = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: body
+                        };
+                    } else if (service === 'order') {
+                        url = `${GATEWAY_URL}/orders`;
+                        const body = document.getElementById('order-create-body').value;
+                        options = {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: body
+                        };
+                    }
+                } else if (endpoint === 'login') {
+                    url = `${GATEWAY_URL}/auth/login`;
+                    const loginBody = document.getElementById('user-login-body').value;
+                    options = {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: loginBody
+                    };
+                } else if (endpoint === 'list') {
+                    url = `${GATEWAY_URL}/products`;
+                    options = { method: 'GET' };
+                }
+
+                const response = await fetch(url, options);
+                const data = await response.json();
+
+                // Store IDs for later use
+                if (service === 'user' && endpoint === 'create' && data.id) {
+                    createdUserId = data.id;
+                }
+                if (service === 'product' && endpoint === 'create' && data.id) {
+                    createdProductId = data.id;
+                }
+
+                responseDiv.textContent = JSON.stringify(data, null, 2);
+                responseDiv.className = `response show ${response.ok ? 'success' : 'error'}`;
+
+                // Update status indicator
+                document.getElementById(`${service}-status`).classList.add('online');
+
+            } catch (error) {
+                responseDiv.textContent = `Error: ${error.message}`;
+                responseDiv.className = 'response show error';
+                document.getElementById(`${service}-status`).classList.remove('online');
+            }
+        }
+
+        async function checkGatewayHealth() {
+            await testEndpoint('gateway', 'info');
+            await testEndpoint('gateway', 'health');
+        }
+
+        async function checkAllServices() {
+            await testEndpoint('gateway', 'health');
+            await testEndpoint('user', 'health');
+            await testEndpoint('product', 'health');
+            await testEndpoint('order', 'health');
+        }
+
+        async function runFullDemo() {
+            alert('Running full demo through API Gateway...\n\n1. Create User\n2. Create Product\n3. Create Order\n\nAll requests go through http://localhost:8080');
+
+            // Create user
+            await testEndpoint('user', 'create');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Create product
+            await testEndpoint('product', 'create');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Update order form with IDs
+            if (createdUserId && createdProductId) {
+                const orderBody = {
+                    userId: createdUserId,
+                    items: [{
+                        productId: createdProductId,
+                        quantity: 2
+                    }]
+                };
+                document.getElementById('order-create-body').value = JSON.stringify(orderBody, null, 2);
+
+                // Create order
+                await testEndpoint('order', 'create');
+            }
+
+            alert('Demo complete! All requests were routed through the API Gateway.');
+        }
+
+        function clearAllResponses() {
+            document.querySelectorAll('.response').forEach(div => {
+                div.className = 'response';
+                div.textContent = '';
+            });
+        }
+
+        // Check gateway health on load
+        window.addEventListener('load', () => {
+            setTimeout(checkGatewayHealth, 1000);
+        });
+    </script>
+</body>
+
+</html>

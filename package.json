@@ -1,0 +1,38 @@
+{
+    "name": "product-order-system",
+    "version": "1.0.0",
+    "description": "Microservices-based product order system with User, Product, and Order services",
+    "private": true,
+    "scripts": {
+        "test": "jest --coverage",
+        "test:watch": "jest --watch",
+        "dev:user": "cd user-service && npm run dev",
+        "dev:product": "cd product-service && npm run dev",
+        "dev:order": "cd order-service && npm run dev",
+        "start:user": "cd user-service && npm start",
+        "start:product": "cd product-service && npm start",
+        "start:order": "cd order-service && npm start",
+        "start:local": "powershell -ExecutionPolicy Bypass -File ./start-local.ps1",
+        "stop:local": "powershell -ExecutionPolicy Bypass -File ./stop-local.ps1",
+        "docker:build": "docker-compose build",
+        "docker:up": "docker-compose up -d",
+        "docker:down": "docker-compose down",
+        "docker:logs": "docker-compose logs -f",
+        "install:all": "cd user-service && npm install && cd ../product-service && npm install && cd ../order-service && npm install && cd .."
+    },
+    "keywords": [
+        "microservices",
+        "nodejs",
+        "mongodb",
+        "kubernetes",
+        "docker"
+    ],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "jest": "^29.7.0",
+        "fast-check": "^3.15.0",
+        "nodemon": "^3.0.2",
+        "@types/jest": "^29.5.11"
+    }
+}

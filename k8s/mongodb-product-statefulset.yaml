@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb-product
+  labels:
+    app: mongodb-product
+spec:
+  serviceName: mongodb-product
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-product
+  template:
+    metadata:
+      labels:
+        app: mongodb-product
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:6.0
+        ports:
+        - containerPort: 27017
+          name: mongodb
+        volumeMounts:
+        - name: mongodb-product-data
+          mountPath: /data/db
+        env:
+        - name: MONGO_INITDB_DATABASE
+          value: productdb
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-product-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi
