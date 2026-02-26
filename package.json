@@ -18,7 +18,11 @@
         "docker:up": "docker-compose up -d",
         "docker:down": "docker-compose down",
         "docker:logs": "docker-compose logs -f",
-        "install:all": "cd user-service && npm install && cd ../product-service && npm install && cd ../order-service && npm install && cd .."
+        "docker:atlas:build": "docker-compose -f docker-compose.atlas.yml build",
+        "docker:atlas:up": "docker-compose -f docker-compose.atlas.yml up -d",
+        "docker:atlas:down": "docker-compose -f docker-compose.atlas.yml down",
+        "docker:atlas:logs": "docker-compose -f docker-compose.atlas.yml logs -f",
+        "install:all": "cd user-service && npm install && cd ../product-service && npm install && cd ../order-service && npm install && cd ../api-gateway && npm install && cd .."
     },
     "keywords": [
         "microservices",

@@ -145,11 +145,35 @@ product-order-system/
 **Want to get started immediately?** See [QUICKSTART.md](./QUICKSTART.md) for step-by-step instructions!
 
 ### Three Ways to Run:
-1. **Docker Compose** (Recommended): Run `npm run docker:up` - easiest and most reliable
-2. **Automated Scripts** (Windows): Run `start-local.ps1` - for local development
-3. **Manual Setup**: Follow detailed instructions below
+1. **Docker Compose with MongoDB Atlas** (Recommended for production-like setup): See [MONGODB-ATLAS-SETUP.md](./MONGODB-ATLAS-SETUP.md)
+2. **Docker Compose with Local MongoDB** (Easiest for development): Run `npm run docker:up`
+3. **Manual Setup** (For advanced users): Follow detailed instructions below
 
-### 🐳 Quick Start with Docker (Recommended)
+### 🌐 Quick Start with MongoDB Atlas (Recommended)
+
+**Prerequisites:** 
+- Docker Desktop installed and running
+- MongoDB Atlas account (free tier available)
+
+```bash
+# 1. Create .env file with your Atlas connection strings
+cp .env.example .env
+# Edit .env with your MongoDB Atlas credentials
+
+# 2. Build all services
+npm run docker:atlas:build
+
+# 3. Start everything
+npm run docker:atlas:up
+
+# 4. Test the system
+# Open test-api-gateway.html in your browser
+# Or visit: http://localhost:8080
+```
+
+See [MONGODB-ATLAS-SETUP.md](./MONGODB-ATLAS-SETUP.md) for complete Atlas setup guide.
+
+### 🐳 Quick Start with Local MongoDB
 
 **Prerequisites:** Docker Desktop installed and running
 
@@ -157,7 +181,7 @@ product-order-system/
 # 1. Build all services
 npm run docker:build
 
-# 2. Start everything
+# 2. Start everything (includes local MongoDB)
 npm run docker:up
 
 # 3. Test the system
@@ -311,19 +335,54 @@ cd order-service && npm test
 
 Services are configured via environment variables:
 
+### Database Configuration
+
+**Option 1: MongoDB Atlas (Recommended for Production)**
+
+Create a `.env` file with your Atlas connection strings:
+```env
+MONGO_URI_USER=mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/userdb?retryWrites=true&w=majority
+MONGO_URI_PRODUCT=mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/productdb?retryWrites=true&w=majority
+MONGO_URI_ORDER=mongodb+srv://username:password@cluster0.xxxxx.mongodb.net/orderdb?retryWrites=true&w=majority
+```
+
+Then use:
+```bash
+npm run docker:atlas:up
+```
+
+See [MONGODB-ATLAS-SETUP.md](./MONGODB-ATLAS-SETUP.md) for detailed setup instructions.
+
+**Option 2: Local MongoDB (Development)**
+
+Use the standard docker-compose which includes MongoDB containers:
+```bash
+npm run docker:up
+```
+
+### Service Configuration
+
 ### User Service
 - `PORT` - Service port (default: 3001)
-- `MONGO_URI` - MongoDB connection string (default: mongodb://localhost:27017/userdb)
+- `MONGO_URI` - MongoDB connection string
 
 ### Product Service
 - `PORT` - Service port (default: 3002)
-- `MONGO_URI` - MongoDB connection string (default: mongodb://localhost:27018/productdb)
+- `MONGO_URI` - MongoDB connection string
 
 ### Order Service
 - `PORT` - Service port (default: 3003)
-- `MONGO_URI` - MongoDB connection string (default: mongodb://localhost:27019/orderdb)
+- `MONGO_URI` - MongoDB connection string
 - `USER_SERVICE_URL` - User service URL (default: http://localhost:3001)
 - `PRODUCT_SERVICE_URL` - Product service URL (default: http://localhost:3002)
+
+### API Gateway
+- `PORT` - Gateway port (default: 8080)
+- `AUTH_ENABLED` - Enable/disable JWT authentication (default: false)
+- `JWT_SECRET` - Secret key for JWT signing
+- `USER_SERVICE_URL` - User service URL
+- `PRODUCT_SERVICE_URL` - Product service URL
+- `ORDER_SERVICE_URL` - Order service URL
 
 ## Key Design Patterns
 

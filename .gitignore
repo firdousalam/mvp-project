@@ -32,3 +32,8 @@ coverage/
 *.pid
 *.seed
 *.pid.lock
+
+# MongoDB Atlas credentials
+.env
+*.pem
+*.key
