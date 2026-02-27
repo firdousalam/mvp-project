@@ -22,6 +22,10 @@
         "docker:atlas:up": "docker-compose -f docker-compose.atlas.yml up -d",
         "docker:atlas:down": "docker-compose -f docker-compose.atlas.yml down",
         "docker:atlas:logs": "docker-compose -f docker-compose.atlas.yml logs -f",
+        "k8s:deploy": "powershell -ExecutionPolicy Bypass -File ./deploy-k8s.ps1",
+        "k8s:cleanup": "powershell -ExecutionPolicy Bypass -File ./cleanup-k8s.ps1",
+        "k8s:status": "kubectl get pods && kubectl get services && kubectl get ingress",
+        "k8s:logs": "kubectl logs -l app=user-service --tail=50",
         "install:all": "cd user-service && npm install && cd ../product-service && npm install && cd ../order-service && npm install && cd ../api-gateway && npm install && cd .."
     },
     "keywords": [

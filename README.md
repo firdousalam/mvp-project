@@ -144,10 +144,46 @@ product-order-system/
 
 **Want to get started immediately?** See [QUICKSTART.md](./QUICKSTART.md) for step-by-step instructions!
 
-### Three Ways to Run:
-1. **Docker Compose with MongoDB Atlas** (Recommended for production-like setup): See [MONGODB-ATLAS-SETUP.md](./MONGODB-ATLAS-SETUP.md)
-2. **Docker Compose with Local MongoDB** (Easiest for development): Run `npm run docker:up`
-3. **Manual Setup** (For advanced users): Follow detailed instructions below
+### Four Ways to Run:
+1. **Kubernetes (Full Production Experience)**: See [KUBERNETES-LOCAL-SETUP.md](./KUBERNETES-LOCAL-SETUP.md) - Complete microservices with Ingress
+2. **Docker Compose with MongoDB Atlas** (Cloud Database): See [MONGODB-ATLAS-SETUP.md](./MONGODB-ATLAS-SETUP.md)
+3. **Docker Compose with Local MongoDB** (Easiest): Run `npm run docker:up`
+4. **Manual Setup** (Advanced): Follow detailed instructions below
+
+### ☸️ Quick Start with Kubernetes (Full Microservices Experience)
+
+**Experience the complete architecture with service discovery, ingress, and orchestration!**
+
+**Prerequisites:** 
+- Docker Desktop with Kubernetes enabled
+- kubectl installed (included with Docker Desktop)
+
+```bash
+# 1. Deploy everything to Kubernetes
+npm run k8s:deploy
+
+# 2. Wait for pods to be ready (2-3 minutes)
+kubectl get pods -w
+
+# 3. Test the system
+curl http://localhost/health/user
+curl http://localhost/health/product
+curl http://localhost/health/order
+
+# 4. Open test dashboard
+# Update test-api-gateway.html to use http://localhost (no port)
+```
+
+**What you get:**
+- ✅ Kubernetes orchestration
+- ✅ Service discovery
+- ✅ Nginx Ingress Controller
+- ✅ Load balancing
+- ✅ Health checks
+- ✅ Self-healing
+- ✅ Scalability
+
+See [KUBERNETES-LOCAL-SETUP.md](./KUBERNETES-LOCAL-SETUP.md) for complete guide.
 
 ### 🌐 Quick Start with MongoDB Atlas (Recommended)
 
