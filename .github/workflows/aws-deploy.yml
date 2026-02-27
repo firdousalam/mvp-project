@@ -1,0 +1,162 @@
+name: Deploy to AWS ECS
+
+on:
+  push:
+    branches:
+      - main
+      - production
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  PROJECT_NAME: product-order-system
+
+jobs:
+  deploy:
+    name: Deploy to AWS ECS
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Get AWS Account ID
+      id: account-id
+      run: |
+        echo "ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)" >> $GITHUB_OUTPUT
+
+    - name: Build, tag, and push User Service image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ env.PROJECT_NAME }}/user-service
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./user-service
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Build, tag, and push Product Service image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ env.PROJECT_NAME }}/product-service
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./product-service
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Build, tag, and push Order Service image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ env.PROJECT_NAME }}/order-service
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./order-service
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Build, tag, and push API Gateway image to Amazon ECR
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ env.PROJECT_NAME }}/api-gateway
+        IMAGE_TAG: ${{ github.sha }}
+      run: |
+        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./api-gateway
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+    - name: Update User Service task definition
+      id: user-task-def
+      run: |
+        sed -e "s/\${AWS_ACCOUNT_ID}/${{ steps.account-id.outputs.ACCOUNT_ID }}/g" \
+            -e "s/\${AWS_REGION}/${{ env.AWS_REGION }}/g" \
+            aws/task-definitions/user-service.json > /tmp/user-service-task-def.json
+        aws ecs register-task-definition --cli-input-json file:///tmp/user-service-task-def.json
+
+    - name: Update Product Service task definition
+      id: product-task-def
+      run: |
+        sed -e "s/\${AWS_ACCOUNT_ID}/${{ steps.account-id.outputs.ACCOUNT_ID }}/g" \
+            -e "s/\${AWS_REGION}/${{ env.AWS_REGION }}/g" \
+            aws/task-definitions/product-service.json > /tmp/product-service-task-def.json
+        aws ecs register-task-definition --cli-input-json file:///tmp/product-service-task-def.json
+
+    - name: Update Order Service task definition
+      id: order-task-def
+      run: |
+        sed -e "s/\${AWS_ACCOUNT_ID}/${{ steps.account-id.outputs.ACCOUNT_ID }}/g" \
+            -e "s/\${AWS_REGION}/${{ env.AWS_REGION }}/g" \
+            aws/task-definitions/order-service.json > /tmp/order-service-task-def.json
+        aws ecs register-task-definition --cli-input-json file:///tmp/order-service-task-def.json
+
+    - name: Update API Gateway task definition
+      id: api-gateway-task-def
+      run: |
+        sed -e "s/\${AWS_ACCOUNT_ID}/${{ steps.account-id.outputs.ACCOUNT_ID }}/g" \
+            -e "s/\${AWS_REGION}/${{ env.AWS_REGION }}/g" \
+            aws/task-definitions/api-gateway.json > /tmp/api-gateway-task-def.json
+        aws ecs register-task-definition --cli-input-json file:///tmp/api-gateway-task-def.json
+
+    - name: Deploy User Service to ECS
+      run: |
+        aws ecs update-service \
+          --cluster ${{ env.PROJECT_NAME }}-cluster \
+          --service user-service \
+          --force-new-deployment \
+          --region ${{ env.AWS_REGION }}
+
+    - name: Deploy Product Service to ECS
+      run: |
+        aws ecs update-service \
+          --cluster ${{ env.PROJECT_NAME }}-cluster \
+          --service product-service \
+          --force-new-deployment \
+          --region ${{ env.AWS_REGION }}
+
+    - name: Deploy Order Service to ECS
+      run: |
+        aws ecs update-service \
+          --cluster ${{ env.PROJECT_NAME }}-cluster \
+          --service order-service \
+          --force-new-deployment \
+          --region ${{ env.AWS_REGION }}
+
+    - name: Deploy API Gateway to ECS
+      run: |
+        aws ecs update-service \
+          --cluster ${{ env.PROJECT_NAME }}-cluster \
+          --service api-gateway \
+          --force-new-deployment \
+          --region ${{ env.AWS_REGION }}
+
+    - name: Wait for services to stabilize
+      run: |
+        aws ecs wait services-stable \
+          --cluster ${{ env.PROJECT_NAME }}-cluster \
+          --services user-service product-service order-service api-gateway \
+          --region ${{ env.AWS_REGION }}
+
+    - name: Get deployment status
+      run: |
+        echo "Deployment completed successfully!"
+        echo "Services status:"
+        aws ecs describe-services \
+          --cluster ${{ env.PROJECT_NAME }}-cluster \
+          --services user-service product-service order-service api-gateway \
+          --query 'services[*].[serviceName,status,runningCount,desiredCount]' \
+          --output table

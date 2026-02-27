@@ -1,0 +1,82 @@
+{
+    "family": "api-gateway",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+    "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/product-order-system-ecs-task-execution-role",
+    "taskRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/product-order-system-ecs-task-role",
+    "containerDefinitions": [
+        {
+            "name": "api-gateway",
+            "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/product-order-system/api-gateway:latest",
+            "essential": true,
+            "portMappings": [
+                {
+                    "containerPort": 3000,
+                    "protocol": "tcp"
+                }
+            ],
+            "environment": [
+                {
+                    "name": "PORT",
+                    "value": "3000"
+                },
+                {
+                    "name": "NODE_ENV",
+                    "value": "production"
+                },
+                {
+                    "name": "USER_SERVICE_URL",
+                    "value": "http://user-service.product-order-system.local:3001"
+                },
+                {
+                    "name": "PRODUCT_SERVICE_URL",
+                    "value": "http://product-service.product-order-system.local:3002"
+                },
+                {
+                    "name": "ORDER_SERVICE_URL",
+                    "value": "http://order-service.product-order-system.local:3003"
+                },
+                {
+                    "name": "AUTH_ENABLED",
+                    "value": "false"
+                },
+                {
+                    "name": "CACHE_ENABLED",
+                    "value": "true"
+                },
+                {
+                    "name": "CACHE_TTL",
+                    "value": "300"
+                }
+            ],
+            "secrets": [
+                {
+                    "name": "JWT_SECRET",
+                    "valueFrom": "arn:aws:ssm:${AWS_REGION}:${AWS_ACCOUNT_ID}:parameter/product-order-system/api-gateway/jwt-secret"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/product-order-system/api-gateway",
+                    "awslogs-region": "${AWS_REGION}",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost:3000/health || exit 1"
+                ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3,
+                "startPeriod": 60
+            }
+        }
+    ]
+}

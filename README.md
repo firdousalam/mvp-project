@@ -34,6 +34,17 @@ The system consists of three independent microservices that communicate via REST
 └─────────────────────────────────────────────────────────────┘
 ```
 
+## Deployment Options
+
+This application can be deployed in multiple ways:
+
+1. **Local Development** - Run services directly with Node.js
+2. **Docker Compose** - Containerized local deployment
+3. **Kubernetes (Local)** - Full orchestration with Minikube/Docker Desktop
+4. **AWS ECS** - Production deployment on AWS (NEW! 🚀)
+
+See the [Quick Start](#quick-start) section below for setup instructions.
+
 ## Services
 
 ### User Service (Port 3001)
@@ -146,9 +157,10 @@ product-order-system/
 
 ### Four Ways to Run:
 1. **Kubernetes (Full Production Experience)**: See [KUBERNETES-LOCAL-SETUP.md](./KUBERNETES-LOCAL-SETUP.md) - Complete microservices with Ingress
-2. **Docker Compose with MongoDB Atlas** (Cloud Database): See [MONGODB-ATLAS-SETUP.md](./MONGODB-ATLAS-SETUP.md)
-3. **Docker Compose with Local MongoDB** (Easiest): Run `npm run docker:up`
-4. **Manual Setup** (Advanced): Follow detailed instructions below
+2. **AWS ECS (Production Cloud Deployment)**: See [AWS-DEPLOYMENT-GUIDE.md](./AWS-DEPLOYMENT-GUIDE.md) - Deploy to AWS with Fargate 🚀
+3. **Docker Compose with MongoDB Atlas** (Cloud Database): See [MONGODB-ATLAS-SETUP.md](./MONGODB-ATLAS-SETUP.md)
+4. **Docker Compose with Local MongoDB** (Easiest): Run `npm run docker:up`
+5. **Manual Setup** (Advanced): Follow detailed instructions below
 
 ### ☸️ Quick Start with Kubernetes (Full Microservices Experience)
 
@@ -184,6 +196,48 @@ curl http://localhost/health/order
 - ✅ Scalability
 
 See [KUBERNETES-LOCAL-SETUP.md](./KUBERNETES-LOCAL-SETUP.md) for complete guide.
+
+### ☁️ Quick Start with AWS ECS (Production Deployment)
+
+**Deploy to AWS cloud with ECS Fargate for a production-ready setup!**
+
+**Prerequisites:** 
+- AWS Account with appropriate permissions
+- AWS CLI installed and configured
+- Docker installed
+- MongoDB Atlas account (for database)
+
+```bash
+# 1. Setup AWS infrastructure (one-time)
+chmod +x aws/setup-aws-infrastructure.sh
+./aws/setup-aws-infrastructure.sh
+
+# 2. Deploy services to AWS
+chmod +x aws/deploy-to-aws.sh
+./aws/deploy-to-aws.sh
+
+# 3. Get your application URL
+aws elbv2 describe-load-balancers \
+  --names product-order-system-alb \
+  --query 'LoadBalancers[0].DNSName' \
+  --output text
+
+# 4. Test the system
+curl http://YOUR-ALB-DNS/health
+```
+
+**What you get:**
+- ✅ AWS ECS Fargate (serverless containers)
+- ✅ Application Load Balancer
+- ✅ Auto-scaling
+- ✅ CloudWatch monitoring
+- ✅ High availability (multi-AZ)
+- ✅ Production-ready security
+- ✅ CI/CD with GitHub Actions
+
+**Estimated cost:** ~$142-182/month
+
+See [AWS-DEPLOYMENT-GUIDE.md](./AWS-DEPLOYMENT-GUIDE.md) for complete AWS deployment guide.
 
 ### 🌐 Quick Start with MongoDB Atlas (Recommended)
 

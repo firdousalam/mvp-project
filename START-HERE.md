@@ -90,6 +90,32 @@ npm run docker:down
 
 ---
 
+## ☁️ Deploy to AWS (Production)
+
+Want to deploy to the cloud? We've got you covered!
+
+**Prerequisites:**
+- AWS Account
+- AWS CLI installed
+- MongoDB Atlas account
+
+**Quick Deploy:**
+```bash
+npm run aws:setup    # One-time setup
+npm run aws:deploy   # Deploy services
+```
+
+See [AWS-QUICKSTART.md](./AWS-QUICKSTART.md) for complete guide.
+
+**What you get:**
+- Production-ready deployment
+- Auto-scaling
+- Load balancing
+- CloudWatch monitoring
+- ~$150/month cost
+
+---
+
 ## ❓ Common Issues
 
 ### "MongoDB is not installed"

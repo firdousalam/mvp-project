@@ -26,6 +26,10 @@
         "k8s:cleanup": "powershell -ExecutionPolicy Bypass -File ./cleanup-k8s.ps1",
         "k8s:status": "kubectl get pods && kubectl get services && kubectl get ingress",
         "k8s:logs": "kubectl logs -l app=user-service --tail=50",
+        "aws:setup": "bash aws/setup-aws-infrastructure.sh",
+        "aws:deploy": "bash aws/deploy-to-aws.sh",
+        "aws:status": "aws ecs describe-services --cluster product-order-system-cluster --services user-service product-service order-service api-gateway",
+        "aws:logs": "aws logs tail /ecs/product-order-system/user-service --follow",
         "install:all": "cd user-service && npm install && cd ../product-service && npm install && cd ../order-service && npm install && cd ../api-gateway && npm install && cd .."
     },
     "keywords": [

@@ -1,0 +1,66 @@
+{
+    "family": "order-service",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+    "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/product-order-system-ecs-task-execution-role",
+    "taskRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/product-order-system-ecs-task-role",
+    "containerDefinitions": [
+        {
+            "name": "order-service",
+            "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/product-order-system/order-service:latest",
+            "essential": true,
+            "portMappings": [
+                {
+                    "containerPort": 3003,
+                    "protocol": "tcp"
+                }
+            ],
+            "environment": [
+                {
+                    "name": "PORT",
+                    "value": "3003"
+                },
+                {
+                    "name": "NODE_ENV",
+                    "value": "production"
+                },
+                {
+                    "name": "USER_SERVICE_URL",
+                    "value": "http://user-service.product-order-system.local:3001"
+                },
+                {
+                    "name": "PRODUCT_SERVICE_URL",
+                    "value": "http://product-service.product-order-system.local:3002"
+                }
+            ],
+            "secrets": [
+                {
+                    "name": "MONGO_URI",
+                    "valueFrom": "arn:aws:ssm:${AWS_REGION}:${AWS_ACCOUNT_ID}:parameter/product-order-system/order-service/mongo-uri"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/product-order-system/order-service",
+                    "awslogs-region": "${AWS_REGION}",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost:3003/health || exit 1"
+                ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3,
+                "startPeriod": 60
+            }
+        }
+    ]
+}
