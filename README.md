@@ -2,7 +2,9 @@
 
 A microservices-based application for managing users, products, and orders. Built with Node.js, MongoDB, Docker, and Kubernetes.
 
-> **🎯 First time here?** Start with [START-HERE.md](./START-HERE.md) for a quick 3-step setup!
+> **🎯 First time here?** Start with [docs/getting-started/START-HERE.md](./docs/getting-started/START-HERE.md) for a quick 3-step setup!
+> 
+> **📚 Full Documentation:** [docs/README.md](./docs/README.md)
 
 ## Architecture Overview
 
@@ -41,9 +43,9 @@ This application can be deployed in multiple ways:
 1. **Local Development** - Run services directly with Node.js
 2. **Docker Compose** - Containerized local deployment
 3. **Kubernetes (Local)** - Full orchestration with Minikube/Docker Desktop
-4. **AWS ECS** - Production deployment on AWS (NEW! 🚀)
+4. **AWS ECS** - Production deployment on AWS
 
-See the [Quick Start](#quick-start) section below for setup instructions.
+📖 **[Compare all options](./docs/getting-started/DEPLOYMENT-OPTIONS.md)**
 
 ## Services
 
@@ -123,7 +125,7 @@ JWT_SECRET=your-secret-key
 # Configure in docker-compose.yml
 ```
 
-See [API-GATEWAY-GUIDE.md](./API-GATEWAY-GUIDE.md) for details.
+See [docs/configuration/API-GATEWAY-GUIDE.md](./docs/configuration/API-GATEWAY-GUIDE.md) for details.
 
 ## Project Structure
 
@@ -153,12 +155,12 @@ product-order-system/
 
 ## 🚀 Quick Start
 
-**Want to get started immediately?** See [QUICKSTART.md](./QUICKSTART.md) for step-by-step instructions!
+**Want to get started immediately?** See [docs/getting-started/QUICKSTART.md](./docs/getting-started/QUICKSTART.md) for step-by-step instructions!
 
 ### Four Ways to Run:
-1. **Kubernetes (Full Production Experience)**: See [KUBERNETES-LOCAL-SETUP.md](./KUBERNETES-LOCAL-SETUP.md) - Complete microservices with Ingress
-2. **AWS ECS (Production Cloud Deployment)**: See [AWS-DEPLOYMENT-GUIDE.md](./AWS-DEPLOYMENT-GUIDE.md) - Deploy to AWS with Fargate 🚀
-3. **Docker Compose with MongoDB Atlas** (Cloud Database): See [MONGODB-ATLAS-SETUP.md](./MONGODB-ATLAS-SETUP.md)
+1. **Kubernetes (Full Production Experience)**: See [docs/kubernetes/KUBERNETES-LOCAL-SETUP.md](./docs/kubernetes/KUBERNETES-LOCAL-SETUP.md) - Complete microservices with Ingress
+2. **AWS ECS (Production Cloud Deployment)**: See [docs/aws/AWS-DEPLOYMENT-GUIDE.md](./docs/aws/AWS-DEPLOYMENT-GUIDE.md) - Deploy to AWS with Fargate 🚀
+3. **Docker Compose with MongoDB Atlas** (Cloud Database): See [docs/configuration/MONGODB-ATLAS-SETUP.md](./docs/configuration/MONGODB-ATLAS-SETUP.md)
 4. **Docker Compose with Local MongoDB** (Easiest): Run `npm run docker:up`
 5. **Manual Setup** (Advanced): Follow detailed instructions below
 
@@ -195,7 +197,7 @@ curl http://localhost/health/order
 - ✅ Self-healing
 - ✅ Scalability
 
-See [KUBERNETES-LOCAL-SETUP.md](./KUBERNETES-LOCAL-SETUP.md) for complete guide.
+See [docs/kubernetes/KUBERNETES-LOCAL-SETUP.md](./docs/kubernetes/KUBERNETES-LOCAL-SETUP.md) for complete guide.
 
 ### ☁️ Quick Start with AWS ECS (Production Deployment)
 
@@ -237,7 +239,7 @@ curl http://YOUR-ALB-DNS/health
 
 **Estimated cost:** ~$142-182/month
 
-See [AWS-DEPLOYMENT-GUIDE.md](./AWS-DEPLOYMENT-GUIDE.md) for complete AWS deployment guide.
+See [docs/aws/AWS-DEPLOYMENT-GUIDE.md](./docs/aws/AWS-DEPLOYMENT-GUIDE.md) for complete AWS deployment guide.
 
 ### 🌐 Quick Start with MongoDB Atlas (Recommended)
 
@@ -261,7 +263,7 @@ npm run docker:atlas:up
 # Or visit: http://localhost:8080
 ```
 
-See [MONGODB-ATLAS-SETUP.md](./MONGODB-ATLAS-SETUP.md) for complete Atlas setup guide.
+See [docs/configuration/MONGODB-ATLAS-SETUP.md](./docs/configuration/MONGODB-ATLAS-SETUP.md) for complete Atlas setup guide.
 
 ### 🐳 Quick Start with Local MongoDB
 
@@ -285,7 +287,7 @@ npm run docker:up
 - Product Service: http://localhost:3002
 - Order Service: http://localhost:3003
 
-See [DOCKER-GUIDE.md](./DOCKER-GUIDE.md) for complete Docker documentation.
+See [docs/docker/DOCKER-GUIDE.md](./docs/docker/DOCKER-GUIDE.md) for complete Docker documentation.
 
 ### Interactive Testing
 Open `test-api-gateway.html` in your browser for a visual API testing dashboard!
@@ -337,7 +339,7 @@ Open `test-api-gateway.html` in your browser for a visual API testing dashboard!
 - Test Dashboard: Open `test-api-gateway.html` in your browser
 - Direct service access also available on ports 3001-3003
 
-See [DOCKER-GUIDE.md](./DOCKER-GUIDE.md) for detailed Docker documentation.
+See [docs/docker/DOCKER-GUIDE.md](./docs/docker/DOCKER-GUIDE.md) for detailed Docker documentation.
 
 ---
 
@@ -441,7 +443,7 @@ Then use:
 npm run docker:atlas:up
 ```
 
-See [MONGODB-ATLAS-SETUP.md](./MONGODB-ATLAS-SETUP.md) for detailed setup instructions.
+See [docs/configuration/MONGODB-ATLAS-SETUP.md](./docs/configuration/MONGODB-ATLAS-SETUP.md) for detailed setup instructions.
 
 **Option 2: Local MongoDB (Development)**
 

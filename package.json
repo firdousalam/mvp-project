@@ -26,6 +26,7 @@
         "k8s:cleanup": "powershell -ExecutionPolicy Bypass -File ./cleanup-k8s.ps1",
         "k8s:status": "kubectl get pods && kubectl get services && kubectl get ingress",
         "k8s:logs": "kubectl logs -l app=user-service --tail=50",
+        "k8s:port-forward": "kubectl port-forward -n ingress-nginx svc/ingress-nginx-controller 8080:80",
         "aws:setup": "bash aws/setup-aws-infrastructure.sh",
         "aws:deploy": "bash aws/deploy-to-aws.sh",
         "aws:status": "aws ecs describe-services --cluster product-order-system-cluster --services user-service product-service order-service api-gateway",
