@@ -205,6 +205,19 @@ kubectl get pods | grep mongodb
 
 ### Step 6: Create ConfigMap and Secrets
 
+**First, setup your secret file:**
+
+```bash
+# Copy the template
+cp k8s/secret.yaml.example k8s/secret.yaml
+
+# Edit with your MongoDB credentials (use local MongoDB or Atlas)
+# For local: mongodb://mongodb-user:27017/userdb
+# For Atlas: mongodb+srv://USERNAME:PASSWORD@cluster0.xxxxx.mongodb.net/userdb
+```
+
+**Then apply the configurations:**
+
 ```bash
 # Create ConfigMap (non-sensitive configuration)
 kubectl apply -f k8s/configmap.yaml
@@ -218,6 +231,8 @@ kubectl apply -f k8s/secret.yaml
 kubectl get configmap
 kubectl get secret
 ```
+
+**Note:** The `secret.yaml` file is gitignored for security. Always use `secret.yaml.example` as a template.
 
 ---
 
